@@ -1,10 +1,10 @@
-players = 5
+players = 2
 game = None
-mySerial = 0
+myPoker = 0
 
-def serial2name(serial):
-    global mySerial
-    if serial == mySerial:
+def Pokername(Poker):
+    global mypoker
+    if poker == myPoker:
         return "you"
     else:
-        return "Player %d" % serial
+        return "Player %d" % poker
