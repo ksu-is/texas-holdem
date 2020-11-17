@@ -15,7 +15,7 @@ def rand_card():
 
 def get_card_value(card):
 	return card[0]
-# Gets the suit of the card
+
 def get_card_suit(card):
 	return card[1]
 
