@@ -31,3 +31,18 @@ def deal_player():
 			player_hand.append(given_card)
 			i = i + 1
 	return player_hand
+
+def discard_cards():
+	time.sleep(4)
+	print('\nYou may choose to discard up to 3 cards for new ones.')
+	print('How many cards do you wish to swap (0-3)?')
+	while True:
+		try:
+			discard_x_cards = int(input('\n> '))
+			if valid_discard_num(discard_x_cards):
+				break
+			else:
+				print('That is not allowed. Please choose between 0 and 3 cards to discard.')
+		except ValueError:
+			print('Invalid command. Input a number between 0-3.')
+	return discard_x_cards
