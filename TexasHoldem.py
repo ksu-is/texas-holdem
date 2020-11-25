@@ -103,3 +103,22 @@ def ident_discardcards(discard_list, player1_hand):
 			cardto_remove.append(player1_hand[4])
 	return cardto_remove
 
+def throw_away_discard_cards(discard_list, player1_hand, cards_to_chuck):
+	for card in cards_to_chuck:
+		if card in player1_hand:
+			player1_hand.remove(card)
+	return player1_hand		
+
+def receive_N_cards(num_discard_cards, player1_hand, cards_to_chuck):
+	i = 0
+	while i < num_discard_cards:
+		received_card = random_card()
+		if received_card not in player1_hand and received_card not in cards_to_chuck:
+			player1_hand.append(received_card)
+			i = i + 1
+	linebreak()
+	print('\nYour final hand is:\n')
+	time.sleep(1)
+	for card in player1_hand:
+		print('   %s of %s' % (card[0], card[1]))
+	return player1_hand
