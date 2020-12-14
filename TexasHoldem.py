@@ -122,3 +122,189 @@ def receive_N_cards(num_discard_cards, player1_hand, cards_to_chuck):
 	for card in player1_hand:
 		print('   %s of %s' % (card[0], card[1]))
 	return player1_hand
+	
+def order_card_values(player1_hand, value_list):
+	ordered_hand = []
+	for value in value_list:
+		for card in player1_hand:
+			try:
+				if int(card[0]) == value:
+					ordered_hand.append(card)
+			except ValueError:
+				if card[0] == value:
+					ordered_hand.append(card)
+	return ordered_hand
+
+def con_player_values(ordered_hand):
+	player_values = []
+	for card in ordered_hand:
+		player_values.append(str(card[0]))
+	
+	low_aces_values_str = ''.join(player_values)
+	
+	trailing_aces = ''
+	for letter in low_aces_values_str:
+		if letter == 'A':
+			trailing_aces += 'A'
+			
+	high_aces_values_str = low_aces_values_str[len(trailing_aces):] + trailing_aces
+	
+	return [low_aces_values_str, high_aces_values_str]
+		
+def is_straight():
+	ordered_values_list = con_player_values(ordered_hand)
+	for string in ordered_values_list:
+		if string in 'A 2 3 4 5 6 7 8 9 10 J Q K A':
+			return True
+	else:
+		return False
+
+def is_flush(player1_hand):
+	player_hand_suit_list = []
+	for card in player1_hand:
+		player_hand_suit_list.append(card[1])
+	if player_hand_suit_list[1:] == player_hand_suit_list[:-1]:
+		return True
+	else:
+		return False
+
+def check_duplicate_values(player1_hand):
+	values_list = []
+	for card in player1_hand:
+		values_list.append(card[0])
+	
+	counted_values = []
+	already_checked_value = []
+	for value in values_list:
+		if value not in already_checked_value:
+			already_checked_value.append(value)
+			if values_list.count(value) == 2:
+				counted_values.append([value, 2])
+			if values_list.count(value) == 3:
+				counted_values.append([value, 3])
+			if values_list.count(value) == 4:
+				counted_values.append([value, 4])
+	
+	return counted_values
+
+def compute_dup_values(player1_hand):
+	duplicate_values_list = check_duplicate_values(player1_hand)
+	
+	if len(duplicate_values_list) == 0:
+		return False
+	
+	if len(duplicate_values_list) == 1:
+		for mini_list in duplicate_values_list:
+			if mini_list[1] == 4:
+				return 'FOUR OF A KIND'
+			if mini_list[1] == 3:
+				return 'THREE OF A KIND'
+			if mini_list[1] == 2:
+				return 'PAIR OF ' + str(mini_list [0]) + 's'
+	
+	if len(duplicate_values_list) == 2:
+		for mini_list in duplicate_values_list:
+			if mini_list[1] == 3:
+				return 'FULL HOUSE'
+		
+		pair_list = []
+		for mini_list in duplicate_values_list:
+			pair = str(mini_list[0])+ 's'
+			pair_list.append(pair)
+		return 'TWO PAIRS OF ' + pair_list[0] + ' AND ' + pair_list[1]
+
+def determine_hand(player1_hand):
+	processed_duplicate = compute_dup_values(player1_hand)
+	if is_straight() and is_flush(player1_hand):
+		return 'STRAIGHT FLUSH'
+	elif processed_duplicate == 'FOUR OF A KIND':
+		return 'FOUR OF A KIND'
+	elif processed_duplicate == 'FULL HOUSE':
+		return 'FULL HOUSE'
+	elif is_flush(player1_hand):
+		return 'FLUSH'
+	elif is_straight():
+		return 'STRAIGHT'
+	elif processed_duplicate == 'THREE OF A KIND':
+		return 'THREE OF A KIND'
+	elif processed_duplicate:
+		return processed_duplicate
+	else:
+		return deterhigh_card(player1_hand)
+
+def deterhigh_card(player1_hand):
+	reversed_value_list = value_list[::-1]
+	for value in reversed_value_list:
+		for card in player1_hand:
+			if card[0] == 'A':
+				return 'HIGH CARD ACE'
+			if card[0] == value:
+				return 'HIGH CARD ' + str(value)
+
+def opponents_hand(value_list):
+	rand_num = random.randint(0, 1000)
+	
+	opponent_val_cards = []
+	i = 0
+	while i < 2:
+		random_value = random.choice(value_list)
+		if random_value not in opponent_val_cards:
+			opponent_val_cards.append(random_value)
+			i += 1
+	
+	if rand_num <= 300:
+		opponent_val_cards[0] = str(random.choice(value_list[6:] + ['A']))
+		opp_hand = 'HIGH card ' + opponent_val_cards[0]
+	elif rand_num <= 700:
+		opp_hand = 'PAIR of ' + str(opponent_val_cards[0]) + 's'
+	elif rand_num <= 900:
+		opp_hand = '2 PAIRS (' + str(opponent_val_cards[0]) + 's and ' + str(opponent_val_cards[1]) + 's)'
+	elif rand_num <= 950:
+		opp_hand = '3 OF A KIND (' + str(opponent_val_cards[0]) + 's)'
+	elif rand_num <= 975:
+		opp_hand = 'STRAIGHT'
+	elif rand_num <= 987:
+		opp_hand = 'FLUSH'
+	elif rand_num <= 995:
+		opp_hand = 'FULL HOUSE (Three ' + str(opponent_val_cards[0]) + 's AND two ' + str(opponent_val_cards[1]) + 's)'
+	elif rand_num <= 999:
+		opp_hand = '4 OF A KIND (' + str(opponent_val_cards[0]) + 's)'
+	else:
+		opp_hand = 'STRAIGHT FLUSH'
+	
+	return [opp_hand, opponent_val_cards]
+
+def play_again():
+	print('\nWould you care to play another round? (y/n)')
+	if input('> ').lower() in ['yes', 'y']:
+		return True
+	else:
+		return False
+			
+print("Mattthew Conway Poker Project")
+print('\nYou play Poker against an skilled player.')
+while True:
+	time.sleep(2.0)
+	dealt_hand = deal_player()
+	
+	tot_discarded_cards = discard_cards()
+	discarded_cards_list = specify_discard_cards(tot_discarded_cards)
+	cards_to_chuck = ident_discardcards(discarded_cards_list, dealt_hand)
+	remaining_hand = throw_away_discard_cards(discarded_cards_list, dealt_hand, cards_to_chuck)
+	
+	new_hand = receive_N_cards(tot_discarded_cards, remaining_hand, cards_to_chuck)
+	ordered_hand = order_card_values(new_hand, value_list)
+	
+	name_player_hand = determine_hand(ordered_hand)
+	
+	time.sleep(2.5)
+	print('\nYou reveal your hand:\n%s' % name_player_hand)
+	time.sleep(1.5)
+	enemy_hand = opponents_hand(value_list)
+	print('\nYour opponent reveals their hand:\n' + enemy_hand[0])
+		
+	if not play_again():
+		print('\nThank you for playing come again')
+		time.sleep(1)
+		break
+linebreak()
